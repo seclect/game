@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="Keywords" content="" >
+		<meta name="Description" content="">
+		<title>贪吃蛇</title>
+
+		<style type="text/css">
+		*{margin:0;}
+		#canvas{background:#FFF;margin:100px auto;display:block;border:10px solid #dbd02c;border-radius:4px;box-shadow:0px 0px 6px #000;}
+
+		</style>
+	</head>
+	<body>
+		<canvas width="450" height="450" id="canvas"></canvas>
+		
+		<script>
+		var canvas = document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+		var width = 15;
+		//初始化蛇的长度
+		var snakeCount=6;
+		//定义一条蛇
+		var snake=[];
+		var foodX=0;
+		var foodY=0;
+		var toGO = 3;
+
+		function drawRect(){
+			for(var i=0;i<30;i++){
+				ctx.strokeStyle="#000";
+				ctx.beginPath();//开始路径
+				ctx.moveTo(i*15,0);
+				ctx.lineTo(i*15,450);
+				ctx.moveTo(0,i*15);
+				ctx.lineTo(450,i*15);
+				ctx.closePath();//结束
+				ctx.stroke();
+			}
+			//画蛇
+			for(var i=0;i<snakeCount;i++){
+				ctx.fillStyle="#000";
+				if(i == snakeCount-1)ctx.fillStyle="red";
+				//绘制矩形
+				ctx.fillRect(snake[i].x,snake[i].y,15,15);
+			}
+
+			//绘制食物
+			ctx.fillStyle="#66ff99";
+			ctx.fillRect(foodX,foodY,15,15);
+			ctx.fill();
+		}
+		//定义蛇的坐标
+		function start(){
+			for(var i=0;i<snakeCount;i++){
+				snake[i] = {x:i*15,y:0}
+			}
+			addFood();
+			drawRect();
+		}
+
+		//添加食物
+		function addFood(){
+			//随机坐标
+			foodX = Math.floor(Math.random()*30)*15;
+			foodY = Math.floor(Math.random()*30)*15;
+			for(var i=0;i<snakeCount-1;i++){
+				if(foodX == snake[i].x && foodY == snake[i].y){
+					addFood();
+				}
+			}
+		}
+		//
+		function move(){
+			switch(toGo){
+				case 1:snake.push({x:snake[snakeCount-1].x-15,y:snake[snakeCount-1].y});break;
+				case 2:snake.push({x:snake[snakeCount-1].x,y:snake[snakeCount-1].y-15});break;
+				case 3:snake.push({x:snake[snakeCount-1].x+15,y:snake[snakeCount-1].y});break;
+				case 4:snake.push({x:snake[snakeCount-1].x,y:snake[snakeCount-1].y+15});break;
+				case 5:snake.push({x:snake[snakeCount-1].x+15,y:snake[snakeCount-1].y+15});break;
+			}
+			snake.shift();
+			ctx.clearRect(0,0,450,450);
+			idDead();
+			isEat();
+			drawRect();
+		}
+		function keyDown(e){
+			switch(e.keyCode){
+				case 37:toGo=1;break;
+				case 38:toGo=2;break;
+				case 39:toGo=3;break;
+				case 40:toGo=4;break;
+				case 81:toGo=5;break;
+			}
+		}
+		function btnstart(){
+			setInterval(move,150);
+			//监听键盘事件
+			document.onkeydown = function(e){
+				//浏览器的兼容性
+				var e = e||window.event;
+				keyDown(e);
+			}
+		}
+		//定义游戏的规则
+		function idDead(){
+			//判断边界
+			if(snake[snakeCount-1].x>435||snake[snakeCount-1].y>435||snake[snakeCount-1].x<0||snake[snakeCount-1].y<0){
+				alert("挂了~");
+				window.location.reload();
+			}
+			
+		}
+		//吃食物
+		function isEat(){
+			if(snake[snakeCount-1].x==foodX&&snake[snakeCount-1].y==foodY){
+				addFood();
+				snakeCount++;
+				snake.unshift({x:-15,y:-15});
+			}
+		}
+
+		window.onload = function(){
+			start();
+			btnstart();
+		}
+		
+		
+		</script>
+	</body>
+</html>
